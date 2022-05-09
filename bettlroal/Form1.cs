@@ -67,6 +67,7 @@ namespace bettlroal
 
         private void btnSend_Click(object sender, EventArgs e)
         {
+
             Message msg = new Message();
             msg.content = textBox1.Text;
             if (msg.content != "")
