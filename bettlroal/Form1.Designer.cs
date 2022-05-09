@@ -38,6 +38,7 @@ namespace bettlroal
             this.btnSend = new System.Windows.Forms.Button();
             this.lbChat = new System.Windows.Forms.ListBox();
             this.lblPublicIP = new System.Windows.Forms.Label();
+            this.btnStream = new System.Windows.Forms.Button();
             this.gbConn.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -93,6 +94,7 @@ namespace bettlroal
             // textBox1
             // 
             this.textBox1.CausesValidation = false;
+            this.textBox1.Enabled = false;
             this.textBox1.Location = new System.Drawing.Point(133, 461);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(702, 20);
@@ -101,6 +103,7 @@ namespace bettlroal
             // 
             // btnSend
             // 
+            this.btnSend.Enabled = false;
             this.btnSend.Location = new System.Drawing.Point(842, 459);
             this.btnSend.Name = "btnSend";
             this.btnSend.Size = new System.Drawing.Size(100, 23);
@@ -125,11 +128,22 @@ namespace bettlroal
             this.lblPublicIP.Size = new System.Drawing.Size(0, 13);
             this.lblPublicIP.TabIndex = 7;
             // 
+            // btnStream
+            // 
+            this.btnStream.Location = new System.Drawing.Point(12, 461);
+            this.btnStream.Name = "btnStream";
+            this.btnStream.Size = new System.Drawing.Size(115, 20);
+            this.btnStream.TabIndex = 8;
+            this.btnStream.Text = "Stream";
+            this.btnStream.UseVisualStyleBackColor = true;
+            this.btnStream.Click += new System.EventHandler(this.btnStream_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(954, 493);
+            this.Controls.Add(this.btnStream);
             this.Controls.Add(this.lblPublicIP);
             this.Controls.Add(this.lbChat);
             this.Controls.Add(this.btnSend);
@@ -156,6 +170,7 @@ namespace bettlroal
         private System.Windows.Forms.Button btnSend;
         private System.Windows.Forms.ListBox lbChat;
         private System.Windows.Forms.Label lblPublicIP;
+        private System.Windows.Forms.Button btnStream;
     }
 }
 

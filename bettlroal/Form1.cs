@@ -56,13 +56,37 @@ namespace bettlroal
         private void btnHost_Click(object sender, EventArgs e)
         {
             gbConn.Enabled = false;
-            lblPublicIP.Text = InternetIO.instance.StartServer();
+            lblPublicIP.Text = InternetIO.instance.StartServer(true);
+            textBox1.Enabled = true;
+            btnSend.Enabled = true;
+            if (lblPublicIP.Text == "error")
+            {
+                var res = MessageBox.Show("Router not found. Portforwarding required. Please contact your system administrator. Proceed without portforwarding?", "Error", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Error);
+                if (res == DialogResult.Yes)
+                {
+                    lblPublicIP.Text = InternetIO.instance.StartServer(false);
+                    return;
+                }
+                gbConn.Enabled = true;
+                textBox1.Enabled = false;
+                btnSend.Enabled = false;
+            }
         }
 
         private void btnConnect_Click(object sender, EventArgs e)
         {
-            InternetIO.instance.Connect(System.Net.IPAddress.Parse(tbIP.Text), int.Parse(tbPort.Text));
-            gbConn.Enabled = false;
+            try
+            {
+                gbConn.Enabled = false;
+                InternetIO.instance.Connect(System.Net.IPAddress.Parse(tbIP.Text), int.Parse(tbPort.Text));
+                textBox1.Enabled = true;
+                btnSend.Enabled = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error while connection to host: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error) ;
+                gbConn.Enabled = true;
+            }
         }
 
         private void btnSend_Click(object sender, EventArgs e)
@@ -95,6 +119,15 @@ namespace bettlroal
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             InternetIO.instance.DeleteMapping();
+        }
+
+        private void btnStream_Click(object sender, EventArgs e)
+        {
+            ChooseScreen sc = new ChooseScreen();
+            if (sc.ShowDialog() == DialogResult.OK)
+            {
+                
+            }
         }
     }
 }

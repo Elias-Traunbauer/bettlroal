@@ -53,14 +53,29 @@ namespace bettlroal
             }
         }
 
-        public string StartServer()
+        public string StartServer(bool portf)
         {
-            device.CreatePortMap(new Mapping(Protocol.Tcp, 60900, 60900));
-            mode = IOType.Server;
-            server = new Server();
-            server.StartServer();
-            server.RecievedMessage += MessagesUpdate;
-            return device.GetExternalIP().ToString();
+            if (device != null && portf)
+            {
+                device.CreatePortMap(new Mapping(Protocol.Tcp, 60900, 60900));
+                mode = IOType.Server;
+                server = new Server();
+                server.StartServer();
+                server.RecievedMessage += MessagesUpdate;
+                return device.GetExternalIP().ToString();
+            }
+            else if (!portf)
+            {
+                mode = IOType.Server;
+                server = new Server();
+                server.StartServer();
+                server.RecievedMessage += MessagesUpdate;
+                return "router not found";
+            }
+            else
+            {
+                return "error";
+            }
         }
 
         Client client;

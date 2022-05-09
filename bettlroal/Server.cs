@@ -32,7 +32,6 @@ namespace bettlroal
 
         public void BroadcastMessages()
         {
-            Debug.WriteLine(Environment.TickCount - lastBroadcast);
             if (Environment.TickCount - lastBroadcast > 50)
             {
                 lastBroadcast = Environment.TickCount;
@@ -70,10 +69,8 @@ namespace bettlroal
                 {
                     Thread.Sleep(25);
                 }
-                Debug.WriteLine("Data avai");
                 NetworkData msg = (NetworkData)binaryFormatter.Deserialize(stream);
                 messageBuffer.Add(msg.msgs[0]);
-                Debug.WriteLine("Count " + msg.msgs.Count);
                 BroadcastMessages();
                 RecievedMessage.Invoke(this, msg);
             }
