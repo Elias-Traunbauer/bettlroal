@@ -15,6 +15,7 @@ namespace bettlroal
         Bitmap[] screens;
         GroupBox[] gbs;
         public int selectedId = -1;
+        public string pw;
 
         public ChooseScreen()
         {
@@ -24,7 +25,7 @@ namespace bettlroal
             for (int i = 0; i < screens.Length; i++)
             {
                 Rectangle bounds = Screen.AllScreens[i].Bounds;
-                screens[i] = new Bitmap(1024, 768);
+                screens[i] = new Bitmap(1920, 1080);
                 Graphics graphics = Graphics.FromImage(screens[i]);
                 graphics.CopyFromScreen(bounds.Left, bounds.Top, 0, 0, bounds.Size);
             }
@@ -39,8 +40,8 @@ namespace bettlroal
                 PictureBox b = new PictureBox();
                 b.Image = screens[i];
                 b.Name = i + "";
-                gbs[i].Width = (int)(this.Width * 0.9 / 2);
-                gbs[i].Height = (int)(gbs[i].Width * 0.75);
+                gbs[i].Width = (int)(this.Width * 0.9);
+                gbs[i].Height = (int)(gbs[i].Width * 0.55);
                 b.Top = 20;
                 b.Left = 15;
                 b.MouseClick += B_MouseClick;
@@ -68,6 +69,7 @@ namespace bettlroal
         {
             if (selectedId != -1)
             {
+                pw = tbStreamPw.Text;
                 DialogResult = DialogResult.OK;
             }
             else

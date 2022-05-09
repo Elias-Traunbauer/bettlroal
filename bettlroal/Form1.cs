@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -12,13 +13,13 @@ namespace bettlroal
 {
     public partial class Form1 : Form
     {
-        Timer t;
+        System.Windows.Forms.Timer t;
         public static string name;
 
         public Form1()
         {
             InitializeComponent();
-            t = new Timer();
+            t = new System.Windows.Forms.Timer();
             t.Interval = 100;
             t.Enabled = true;
             t.Tick += T_Tick;
@@ -123,11 +124,21 @@ namespace bettlroal
 
         private void btnStream_Click(object sender, EventArgs e)
         {
-            ChooseScreen sc = new ChooseScreen();
-            if (sc.ShowDialog() == DialogResult.OK)
+            ChooseScreen cs = new ChooseScreen();
+            if (cs.ShowDialog() == DialogResult.OK)
             {
-                
+                ScreenCast sc = new ScreenCast(cs.selectedId);
+                Thread d = new Thread(sc.CaptureScreen);
+                d.IsBackground = true;
+                MessageBox.Show("Starting capture thread");
+                d.Start();
             }
+        }
+
+        private void btnOpenStream_Click(object sender, EventArgs e)
+        {
+            Stream s = new Stream();
+            s.Show();
         }
     }
 }

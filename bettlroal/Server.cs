@@ -55,6 +55,22 @@ namespace bettlroal
             }
         }
 
+        public void BroadcastData(NetworkData d)
+        {
+            foreach (var item in clients)
+            {
+                try
+                {
+                    binaryFormatter.Serialize(item, d);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+
+            }
+        }
+
         private void ServerClientLoop(Object obj)
         {
             Socket client = (Socket)obj;
@@ -65,7 +81,7 @@ namespace bettlroal
 
             while (true)
             {
-                while(!stream.DataAvailable)
+                while (!stream.DataAvailable)
                 {
                     Thread.Sleep(25);
                 }

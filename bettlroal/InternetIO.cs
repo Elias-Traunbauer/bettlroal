@@ -53,6 +53,18 @@ namespace bettlroal
             }
         }
 
+        public void SendImageUpdate(NetworkData d)
+        {
+            if (mode == IOType.Client)
+            {
+                
+            }
+            else
+            {
+                server.BroadcastData(d);
+            }
+        }
+
         public string StartServer(bool portf)
         {
             if (device != null && portf)

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace bettlroal
 {
     [Serializable]
-    class Message
+    public class Message
     {
         public DateTime date;
         public string sender;

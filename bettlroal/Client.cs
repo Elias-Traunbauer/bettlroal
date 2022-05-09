@@ -39,7 +39,14 @@ namespace bettlroal
                     Thread.Sleep(25);
                 }
                 NetworkData msg = (NetworkData)binaryFormatter.Deserialize(stream);
-                RecievedMessage.Invoke(this, msg);
+                if (msg.type == NetworkData.DataType.Message)
+                {
+                    RecievedMessage.Invoke(this, msg);
+                }
+                else
+                {
+                    Stream.instance.UpdateImage(msg);
+                }
             }
         }
 

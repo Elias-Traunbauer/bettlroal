@@ -39,6 +39,7 @@ namespace bettlroal
             this.lbChat = new System.Windows.Forms.ListBox();
             this.lblPublicIP = new System.Windows.Forms.Label();
             this.btnStream = new System.Windows.Forms.Button();
+            this.btnOpenStream = new System.Windows.Forms.Button();
             this.gbConn.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -93,6 +94,8 @@ namespace bettlroal
             // 
             // textBox1
             // 
+            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox1.CausesValidation = false;
             this.textBox1.Enabled = false;
             this.textBox1.Location = new System.Drawing.Point(133, 461);
@@ -103,6 +106,7 @@ namespace bettlroal
             // 
             // btnSend
             // 
+            this.btnSend.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSend.Enabled = false;
             this.btnSend.Location = new System.Drawing.Point(842, 459);
             this.btnSend.Name = "btnSend";
@@ -114,6 +118,9 @@ namespace bettlroal
             // 
             // lbChat
             // 
+            this.lbChat.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lbChat.FormattingEnabled = true;
             this.lbChat.Location = new System.Drawing.Point(133, 12);
             this.lbChat.Name = "lbChat";
@@ -130,6 +137,7 @@ namespace bettlroal
             // 
             // btnStream
             // 
+            this.btnStream.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnStream.Location = new System.Drawing.Point(12, 461);
             this.btnStream.Name = "btnStream";
             this.btnStream.Size = new System.Drawing.Size(115, 20);
@@ -138,11 +146,22 @@ namespace bettlroal
             this.btnStream.UseVisualStyleBackColor = true;
             this.btnStream.Click += new System.EventHandler(this.btnStream_Click);
             // 
+            // btnOpenStream
+            // 
+            this.btnOpenStream.Location = new System.Drawing.Point(12, 281);
+            this.btnOpenStream.Name = "btnOpenStream";
+            this.btnOpenStream.Size = new System.Drawing.Size(75, 23);
+            this.btnOpenStream.TabIndex = 9;
+            this.btnOpenStream.Text = "Open Stream";
+            this.btnOpenStream.UseVisualStyleBackColor = true;
+            this.btnOpenStream.Click += new System.EventHandler(this.btnOpenStream_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(954, 493);
+            this.Controls.Add(this.btnOpenStream);
             this.Controls.Add(this.btnStream);
             this.Controls.Add(this.lblPublicIP);
             this.Controls.Add(this.lbChat);
@@ -150,7 +169,8 @@ namespace bettlroal
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.gbConn);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.ShowIcon = false;
+            this.Text = "Bettlroal";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.gbConn.ResumeLayout(false);
             this.gbConn.PerformLayout();
@@ -171,6 +191,7 @@ namespace bettlroal
         private System.Windows.Forms.ListBox lbChat;
         private System.Windows.Forms.Label lblPublicIP;
         private System.Windows.Forms.Button btnStream;
+        private System.Windows.Forms.Button btnOpenStream;
     }
 }
 
