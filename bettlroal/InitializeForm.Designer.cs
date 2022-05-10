@@ -74,7 +74,6 @@ namespace bettlroal
             this.MinimizeBox = false;
             this.Name = "InitializeForm";
             this.ShowIcon = false;
-            this.ShowInTaskbar = false;
             this.Text = "InitializeForm";
             this.Load += new System.EventHandler(this.InitializeForm_Load);
             this.ResumeLayout(false);

@@ -36,10 +36,10 @@ namespace bettlroal
             this.gbConn = new System.Windows.Forms.GroupBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.btnSend = new System.Windows.Forms.Button();
-            this.lbChat = new System.Windows.Forms.ListBox();
             this.lblPublicIP = new System.Windows.Forms.Label();
             this.btnStream = new System.Windows.Forms.Button();
             this.btnOpenStream = new System.Windows.Forms.Button();
+            this.flpChat = new System.Windows.Forms.FlowLayoutPanel();
             this.gbConn.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -116,17 +116,6 @@ namespace bettlroal
             this.btnSend.UseVisualStyleBackColor = true;
             this.btnSend.Click += new System.EventHandler(this.btnSend_Click);
             // 
-            // lbChat
-            // 
-            this.lbChat.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbChat.FormattingEnabled = true;
-            this.lbChat.Location = new System.Drawing.Point(133, 12);
-            this.lbChat.Name = "lbChat";
-            this.lbChat.Size = new System.Drawing.Size(809, 433);
-            this.lbChat.TabIndex = 6;
-            // 
             // lblPublicIP
             // 
             this.lblPublicIP.AutoSize = true;
@@ -156,15 +145,29 @@ namespace bettlroal
             this.btnOpenStream.UseVisualStyleBackColor = true;
             this.btnOpenStream.Click += new System.EventHandler(this.btnOpenStream_Click);
             // 
+            // flpChat
+            // 
+            this.flpChat.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.flpChat.AutoScroll = true;
+            this.flpChat.BackColor = System.Drawing.SystemColors.ActiveBorder;
+            this.flpChat.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.flpChat.Location = new System.Drawing.Point(133, 12);
+            this.flpChat.Name = "flpChat";
+            this.flpChat.Size = new System.Drawing.Size(809, 441);
+            this.flpChat.TabIndex = 11;
+            this.flpChat.WrapContents = false;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(954, 493);
+            this.Controls.Add(this.flpChat);
             this.Controls.Add(this.btnOpenStream);
             this.Controls.Add(this.btnStream);
             this.Controls.Add(this.lblPublicIP);
-            this.Controls.Add(this.lbChat);
             this.Controls.Add(this.btnSend);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.gbConn);
@@ -188,10 +191,10 @@ namespace bettlroal
         private System.Windows.Forms.GroupBox gbConn;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button btnSend;
-        private System.Windows.Forms.ListBox lbChat;
         private System.Windows.Forms.Label lblPublicIP;
         private System.Windows.Forms.Button btnStream;
         private System.Windows.Forms.Button btnOpenStream;
+        private System.Windows.Forms.FlowLayoutPanel flpChat;
     }
 }
 

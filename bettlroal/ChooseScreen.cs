@@ -16,6 +16,7 @@ namespace bettlroal
         GroupBox[] gbs;
         public int selectedId = -1;
         public string pw;
+        public int quality;
 
         public ChooseScreen()
         {
@@ -70,6 +71,7 @@ namespace bettlroal
             if (selectedId != -1)
             {
                 pw = tbStreamPw.Text;
+                quality = (int)numQuality.Value;
                 DialogResult = DialogResult.OK;
             }
             else

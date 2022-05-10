@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
@@ -27,7 +28,11 @@ namespace bettlroal
         {
             NetworkData d = new NetworkData();
             d.msgs.Add(msg);
-            binaryFormatter.Serialize(stream, d);
+
+            lock (stream)
+            {
+                binaryFormatter.Serialize(stream, d);
+            }
         }
 
         private void ServerClientLoop()
@@ -45,7 +50,10 @@ namespace bettlroal
                 }
                 else
                 {
-                    Stream.instance.UpdateImage(msg);
+                    if (Stream.instance != null)
+                    {
+                        Stream.instance.UpdateImage(msg);
+                    }
                 }
             }
         }
@@ -57,6 +65,7 @@ namespace bettlroal
             stream = new NetworkStream(server);
 
             Thread d = new Thread(new ThreadStart(ServerClientLoop));
+            d.Name = "Server Communication Thread";
             d.IsBackground = true;
             d.Start();
         }

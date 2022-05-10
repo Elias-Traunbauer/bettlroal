@@ -22,29 +22,50 @@ namespace bettlroal
             instance = this;
         }
 
+        int time = 0;
+        int frames = 0;
+
         byte[] previous = new byte[0];
 
-        public void UpdateImage(NetworkData d)
+        delegate void UpdateImg(NetworkData d);
+
+        public void UpdateImage(NetworkData asd)
         {
-            if (previous.Length != d.imageSize)
+            UpdateImg ds = (NetworkData d) =>
             {
-                previous = new byte[d.imageSize];
-            }
-            foreach (var chunk in d.chunks)
-            {
-                byte[] prevChunk = new byte[chunk.bytes.Length];
-                previous.CopyTo(prevChunk, chunk.start);
-                if (prevChunk != chunk.bytes)
+                if (Environment.TickCount - time >= 1000)
+                {
+                    int fps = frames / ((Environment.TickCount - time) / 1000);
+                    label2.Text = "fps: " + fps;
+                    time = Environment.TickCount;
+                    frames = 0;
+                }
+                frames++;
+                if (previous.Length != d.imageSize)
+                {
+                    previous = new byte[d.imageSize];
+                }
+                foreach (var chunk in d.chunks)
                 {
                     chunk.bytes.CopyTo(previous, chunk.start);
                 }
+                Bitmap b = new Bitmap(d.Stride, d.imageSize / 4 / d.Stride);
+                BitmapData data = b.LockBits(new Rectangle(0, 0, b.Width, b.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                IntPtr ptr = data.Scan0;
+                Marshal.Copy(previous, 0, ptr, previous.Length);
+                b.UnlockBits(data);
+                pbStream.Image = b;
+                pbStream.Update();
+                label1.Text = d.chunks.Count + " Chunks";
+            };
+            try
+            {
+                Invoke(ds, asd);
             }
-            Bitmap b = new Bitmap(1920, 1080);
-            BitmapData data = b.LockBits(new Rectangle(0, 0, b.Width, b.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            IntPtr ptr = data.Scan0;
-            Marshal.Copy(previous, 0, ptr, previous.Length);
-            b.UnlockBits(data);
-            pbStream.Image = b;
+            catch (Exception)
+            {
+                instance = null;
+            }
         }
 
         private void Stream_Load(object sender, EventArgs e)

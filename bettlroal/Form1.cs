@@ -40,7 +40,11 @@ namespace bettlroal
             MessageUpdate d = (object senderr, NetworkData ee) => {
                 foreach (var msg in e.msgs)
                 {
-                    lbChat.Items.Add(msg.date.ToString() + " " + msg.sender + ": " + msg.content);
+                    Label l = new Label();
+                    l.AutoSize = true;
+                    l.Text = msg.date.ToString() + " " + msg.sender + ": " + msg.content;
+                    flpChat.Controls.Add(l);
+                    flpChat.ScrollControlIntoView(l);
                 }
             };
             Invoke(d, new object[] { sender, e });
@@ -128,10 +132,15 @@ namespace bettlroal
             if (cs.ShowDialog() == DialogResult.OK)
             {
                 ScreenCast sc = new ScreenCast(cs.selectedId);
-                Thread d = new Thread(sc.CaptureScreen);
-                d.IsBackground = true;
-                MessageBox.Show("Starting capture thread");
-                d.Start();
+                sc.minQuality = cs.quality;
+                for (int i = 0; i < 3; i++)
+                {
+                    Thread d = new Thread(sc.CaptureScreen);
+                    d.IsBackground = true;
+                    d.Name = "Screen Cast Thread";
+                    d.Start();
+                }
+
             }
         }
 

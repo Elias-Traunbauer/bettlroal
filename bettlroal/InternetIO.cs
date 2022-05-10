@@ -49,7 +49,10 @@ namespace bettlroal
         {
             if (mode == IOType.Server)
             {
-                device.DeletePortMap(new Mapping(Protocol.Tcp, 60900, 60900));
+                if (device != null)
+                {
+                    device.DeletePortMap(new Mapping(Protocol.Tcp, 60900, 60900));
+                }
             }
         }
 
@@ -82,7 +85,8 @@ namespace bettlroal
                 server = new Server();
                 server.StartServer();
                 server.RecievedMessage += MessagesUpdate;
-                return "router not found";
+                IPAddress ip = System.Net.Dns.GetHostEntry(Environment.MachineName).AddressList.Where(i => i.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).FirstOrDefault();
+                return ip.ToString();
             }
             else
             {

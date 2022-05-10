@@ -17,10 +17,12 @@ namespace bettlroal
         public List<ImageChunk> chunks;
         public List<Message> msgs;
         public int imageSize;
+        public int Stride;
 
         public NetworkData ()
         {
             msgs = new List<Message>();
+            chunks = new List<ImageChunk>();
             type = DataType.Message;
         }
 

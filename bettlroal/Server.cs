@@ -34,6 +34,10 @@ namespace bettlroal
         {
             if (Environment.TickCount - lastBroadcast > 50)
             {
+                if (messageBuffer.Count == 0)
+                {
+                    return;
+                }
                 lastBroadcast = Environment.TickCount;
                 NetworkData d = new NetworkData();
                 lock (messageBuffer)
@@ -43,7 +47,10 @@ namespace bettlroal
                     {
                         try
                         {
-                            binaryFormatter.Serialize(item, d);
+                            lock (item)
+                            {
+                                binaryFormatter.Serialize(item, d);
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -57,17 +64,23 @@ namespace bettlroal
 
         public void BroadcastData(NetworkData d)
         {
-            foreach (var item in clients)
+            lock (clients)
             {
-                try
+                foreach (var item in clients)
                 {
-                    binaryFormatter.Serialize(item, d);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex.Message);
-                }
+                    try
+                    {
+                        lock (item)
+                        {
+                            binaryFormatter.Serialize(item, d);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                    }
 
+                }
             }
         }
 
@@ -75,9 +88,10 @@ namespace bettlroal
         {
             Socket client = (Socket)obj;
             NetworkStream stream = new NetworkStream(client);
-            clients.Add(stream);
-            server.ReceiveBufferSize = 8;
-            server.SendBufferSize = 8;
+            lock (clients)
+            {
+                clients.Add(stream);
+            }
 
             while (true)
             {
@@ -98,6 +112,7 @@ namespace bettlroal
             server.Bind(new IPEndPoint(IPAddress.Any, 60900));
             server.Listen(100);
             Thread d = new Thread(ServerLoop);
+            d.Name = "Server Accept Thread";
             d.IsBackground = true;
             d.Start();
         }
@@ -107,7 +122,9 @@ namespace bettlroal
             while (true)
             {
                 Socket s = server.Accept();
+
                 Thread d = new Thread(new ParameterizedThreadStart(ServerClientLoop));
+                d.Name = "Client Communication Thread";
                 d.IsBackground = true;
                 d.Start(s);
             }

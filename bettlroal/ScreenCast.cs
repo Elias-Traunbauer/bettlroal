@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -16,6 +19,13 @@ namespace bettlroal
         private bool running;
         int screenId;
         byte[] previous;
+        int frames = 0;
+        int timeStart = 0;
+        int qualityModifier = 1;
+        public int minQuality = 2;
+        int lastUpdateSent = 0;
+        int lastScreen = 0;
+        int pauseBetweenScreens = 50;
 
         public ScreenCast(int id)
         {
@@ -24,15 +34,75 @@ namespace bettlroal
             running = true;
         }
 
+        public static Bitmap ResizeImage(Image image, int width, int height)
+        {
+            var destRect = new Rectangle(0, 0, width, height);
+            var destImage = new Bitmap(width, height);
+
+            destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+
+            using (var graphics = Graphics.FromImage(destImage))
+            {
+                graphics.CompositingMode = CompositingMode.SourceCopy;
+                graphics.CompositingQuality = CompositingQuality.HighQuality;
+                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                graphics.SmoothingMode = SmoothingMode.HighQuality;
+                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                using (var wrapMode = new ImageAttributes())
+                {
+                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+                    graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
+                }
+            }
+
+            return destImage;
+        }
+
         public void CaptureScreen()
         {
             while (running)
             {
-                Rectangle bounds = Screen.AllScreens[screenId].Bounds;
-                Bitmap b = new Bitmap(1920, 1080);
-                Graphics graphics = Graphics.FromImage(b);
-                graphics.CopyFromScreen(bounds.Left, bounds.Top, 0, 0, bounds.Size);
+                int screenTaken = 0;
+                if (Environment.TickCount - timeStart >= 1000)
+                {
+                    int fps = frames / (Environment.TickCount - timeStart) * 1000;
+                    frames = 0;
+                    timeStart = Environment.TickCount;
+                    if (fps < 20)
+                    {
+                        qualityModifier--;
+                        if (qualityModifier < minQuality)
+                        {
+                            qualityModifier = minQuality;
+                        }
+                    }
+                    else if (fps > 25)
+                    {
+                        qualityModifier++;
+                        if (qualityModifier > 10)
+                        {
+                            qualityModifier = 10;
+                        }
+                    }
+                }
 
+                Rectangle bounds = Screen.AllScreens[screenId].Bounds;
+                Bitmap b = new Bitmap(bounds.Width, bounds.Height);
+                Graphics graphics = Graphics.FromImage(b);
+                int wait = lastScreen - Environment.TickCount;
+                wait += pauseBetweenScreens;
+                if (wait < 0)
+                {
+                    wait = 0;
+                }
+                lastScreen = Environment.TickCount + wait;
+                Debug.WriteLine("Last screen: " +lastScreen);
+                Debug.WriteLine("Wait: " + wait);
+                Thread.Sleep(wait);
+                graphics.CopyFromScreen(bounds.Left, bounds.Top, 0, 0, bounds.Size);
+                screenTaken = Environment.TickCount;
+                b = ResizeImage(b, (int)(b.Width * qualityModifier / 10), (int)(b.Height * qualityModifier / 10));
                 BitmapData data = b.LockBits(new Rectangle(0, 0, b.Width, b.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 IntPtr intPtr = data.Scan0;
                 int bytes = Math.Abs(data.Stride) * b.Height;
@@ -44,10 +114,12 @@ namespace bettlroal
                 {
                     if (rgbValues.Length != previous.Length)
                     {
-                        for (int i = 0; i < rgbValues.Length; i += 9)
+                        for (int i = 0; i < rgbValues.Length; i += 9*100)
                         {
                             ImageChunk chunk = new ImageChunk();
-                            chunk.bytes = new byte[Math.Min(9, rgbValues.Length - i)];
+                            chunk.bytes = new byte[Math.Min(9*100, rgbValues.Length - i)];
+                            chunk.start = i;
+                            
                             for (int j = 0; j < chunk.bytes.Length; j++)
                             {
                                 chunk.bytes[j] = rgbValues[i+ j];
@@ -57,14 +129,23 @@ namespace bettlroal
                     }
                     else
                     {
-                        for (int i = 0; i < rgbValues.Length; i += data.Stride)
+                        for (int i = 0; i < rgbValues.Length; i += data.Stride * 3)
                         {
+                            int length = Math.Min(data.Stride * 3, rgbValues.Length - i);
                             ImageChunk chunk = new ImageChunk();
-                            chunk.bytes = new byte[data.Stride];
-                            rgbValues.CopyTo(chunk.bytes, i);
-                            byte[] oldChunk = new byte[data.Stride];
-                            previous.CopyTo(oldChunk, i);
-                            if (oldChunk != chunk.bytes)
+                            chunk.bytes = new byte[length];
+                            chunk.start = i;
+                            for (int j = 0; j < chunk.bytes.Length; j++)
+                            {
+                                chunk.bytes[j] = rgbValues[i + j];
+                            }
+                            
+                            byte[] oldChunk = new byte[length];
+                            for (int j = 0; j < oldChunk.Length; j++)
+                            {
+                                oldChunk[j] = previous[i + j];
+                            }
+                            if (!oldChunk.SequenceEqual(chunk.bytes))
                             {
                                 chunks.Add(chunk);
                             }
@@ -75,10 +156,16 @@ namespace bettlroal
                 }
 
                 NetworkData d = new NetworkData();
+                d.Stride = b.Width;
                 d.imageSize = rgbValues.Length;
                 d.type = NetworkData.DataType.ImageUpdate;
                 d.chunks = chunks;
-                InternetIO.instance.SendImageUpdate(d);
+                if (lastUpdateSent < screenTaken)
+                {
+                    lastUpdateSent = screenTaken;
+                    InternetIO.instance.SendImageUpdate(d);
+                    frames++;
+                }
             }
         }
     }
