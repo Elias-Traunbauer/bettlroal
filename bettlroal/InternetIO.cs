@@ -72,7 +72,14 @@ namespace bettlroal
         {
             if (device != null && portf)
             {
-                device.CreatePortMap(new Mapping(Protocol.Tcp, 60900, 60900));
+                try
+                {
+                    device.CreatePortMap(new Mapping(Protocol.Tcp, 60900, 60900));
+                }
+                catch (Exception)
+                {
+
+                }
                 mode = IOType.Server;
                 server = new Server();
                 server.StartServer();

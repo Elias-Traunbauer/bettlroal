@@ -129,9 +129,9 @@ namespace bettlroal
                     }
                     else
                     {
-                        for (int i = 0; i < rgbValues.Length; i += data.Stride * 3)
+                        for (int i = 0; i < rgbValues.Length; i += data.Stride)
                         {
-                            int length = Math.Min(data.Stride * 3, rgbValues.Length - i);
+                            int length = Math.Min(data.Stride, rgbValues.Length - i);
                             ImageChunk chunk = new ImageChunk();
                             chunk.bytes = new byte[length];
                             chunk.start = i;
