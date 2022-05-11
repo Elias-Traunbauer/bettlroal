@@ -26,7 +26,7 @@ namespace bettlroal
             for (int i = 0; i < screens.Length; i++)
             {
                 Rectangle bounds = Screen.AllScreens[i].Bounds;
-                screens[i] = new Bitmap(1920, 1080);
+                screens[i] = new Bitmap(bounds.Width, bounds.Height);
                 Graphics graphics = Graphics.FromImage(screens[i]);
                 graphics.CopyFromScreen(bounds.Left, bounds.Top, 0, 0, bounds.Size);
             }
@@ -64,6 +64,7 @@ namespace bettlroal
             }
             selectedId = int.Parse(((PictureBox)sender).Name);
             gbs[selectedId].BackColor = Color.LightGray;
+            button1.Enabled = true;
         }
 
         private void button1_Click(object sender, EventArgs e)

@@ -126,21 +126,33 @@ namespace bettlroal
             InternetIO.instance.DeleteMapping();
         }
 
+        ScreenCast sc;
+
         private void btnStream_Click(object sender, EventArgs e)
         {
-            ChooseScreen cs = new ChooseScreen();
-            if (cs.ShowDialog() == DialogResult.OK)
+            if (sc == null)
             {
-                ScreenCast sc = new ScreenCast(cs.selectedId);
-                sc.minQuality = cs.quality;
-                for (int i = 0; i < 3; i++)
+                ChooseScreen cs = new ChooseScreen();
+                if (cs.ShowDialog() == DialogResult.OK)
                 {
-                    Thread d = new Thread(sc.CaptureScreen);
-                    d.IsBackground = true;
-                    d.Name = "Screen Cast Thread";
-                    d.Start();
-                }
+                    sc = new ScreenCast(cs.selectedId);
+                    sc.minQuality = cs.quality;
+                    for (int i = 0; i < 3; i++)
+                    {
+                        Thread d = new Thread(sc.CaptureScreen);
+                        d.IsBackground = true;
+                        d.Name = "Screen Cast Thread";
+                        d.Start();
+                    }
 
+                }
+                btnStream.Text = "End Stream";
+            }
+            else
+            {
+                sc.running = false;
+                sc = null;
+                btnStream.Text = "Stream";
             }
         }
 
@@ -148,6 +160,22 @@ namespace bettlroal
         {
             Stream s = new Stream();
             s.Show();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void numericUpDown3_ValueChanged(object sender, EventArgs e)
+        {
+            ScreenCast.changeThreshold = (int)numericUpDown3.Value;
+            
+        }
+
+        private void numericUpDown2_ValueChanged(object sender, EventArgs e)
+        {
+            ScreenCast.chunkDivider = (int)numericUpDown2.Value;
         }
     }
 }

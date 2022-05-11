@@ -24,6 +24,7 @@ namespace bettlroal
 
         int time = 0;
         int frames = 0;
+        int bytes = 0;
 
         byte[] previous = new byte[0];
 
@@ -35,22 +36,57 @@ namespace bettlroal
             {
                 if (Environment.TickCount - time >= 1000)
                 {
-                    int fps = frames / ((Environment.TickCount - time) / 1000);
+                    double fps = frames / ((Environment.TickCount - time) / 1000);
+                    double bps = bytes / ((Environment.TickCount - time) / 1000);
+                    double bpss = bps * 8;
+                    string calling = "b";
+                    string callingg = "bit";
+                    if (bps > 1000)
+                    {
+                        bps /= 1000;
+                        calling = "kb";
+                    }
+                    if (bps > 1000)
+                    {
+                        bps /= 1000;
+                        calling = "mb";
+                    }
+
+                    if (bpss > 1000)
+                    {
+                        bpss /= 1000;
+                        callingg = "kbp";
+                    }
+                    if (bpss > 1000)
+                    {
+                        bpss /= 1000;
+                        callingg = "mbp";
+                    }
                     label2.Text = "fps: " + fps;
+                    lblBytes.Text = "transfer rate: " + bps + calling + "/s   " + bpss +  callingg + "/s";
                     time = Environment.TickCount;
                     frames = 0;
+                    bytes = 0;
                 }
                 frames++;
-                if (previous.Length != d.imageSize)
+                if (previous.Length != d.imageSize || cbDebug.Checked)
                 {
                     previous = new byte[d.imageSize];
                 }
                 foreach (var chunk in d.chunks)
                 {
-                    chunk.bytes.CopyTo(previous, chunk.start);
+                    byte[] chunkbytes = chunk.GetBytes();
+                    bytes += chunkbytes.Length;
+                    for (int y = 0; y < chunk.height; y++)
+                    {
+                        for (int x = 0; x < chunk.width; x++)
+                        {
+                            previous[chunk.start + y * d.Stride + x] = chunkbytes[y * chunk.width + x];
+                        }
+                    }
                 }
-                Bitmap b = new Bitmap(d.Stride, d.imageSize / 4 / d.Stride);
-                BitmapData data = b.LockBits(new Rectangle(0, 0, b.Width, b.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                Bitmap b = new Bitmap(d.Stride / 2, previous.Length / (d.Stride));
+                BitmapData data = b.LockBits(new Rectangle(0, 0, b.Width, b.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format16bppRgb555);
                 IntPtr ptr = data.Scan0;
                 Marshal.Copy(previous, 0, ptr, previous.Length);
                 b.UnlockBits(data);

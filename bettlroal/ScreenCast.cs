@@ -16,7 +16,7 @@ namespace bettlroal
 {
     class ScreenCast
     {
-        private bool running;
+        public bool running;
         int screenId;
         byte[] previous;
         int frames = 0;
@@ -26,6 +26,9 @@ namespace bettlroal
         int lastUpdateSent = 0;
         int lastScreen = 0;
         int pauseBetweenScreens = 50;
+
+        public static int chunkDivider = 10;
+        public static int changeThreshold = 30;
 
         public ScreenCast(int id)
         {
@@ -97,13 +100,13 @@ namespace bettlroal
                     wait = 0;
                 }
                 lastScreen = Environment.TickCount + wait;
-                Debug.WriteLine("Last screen: " +lastScreen);
+                Debug.WriteLine("Last screen: " + lastScreen);
                 Debug.WriteLine("Wait: " + wait);
                 Thread.Sleep(wait);
                 graphics.CopyFromScreen(bounds.Left, bounds.Top, 0, 0, bounds.Size);
                 screenTaken = Environment.TickCount;
                 b = ResizeImage(b, (int)(b.Width * qualityModifier / 10), (int)(b.Height * qualityModifier / 10));
-                BitmapData data = b.LockBits(new Rectangle(0, 0, b.Width, b.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                BitmapData data = b.LockBits(new Rectangle(0, 0, b.Width, b.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format16bppRgb555);
                 IntPtr intPtr = data.Scan0;
                 int bytes = Math.Abs(data.Stride) * b.Height;
                 byte[] rgbValues = new byte[bytes];
@@ -114,17 +117,27 @@ namespace bettlroal
                 {
                     if (rgbValues.Length != previous.Length)
                     {
-                        for (int i = 0; i < rgbValues.Length; i += 9*100)
+                        int chunkWidth = data.Stride / chunkDivider;
+                        int chunkHeight = data.Height / chunkDivider;
+
+                        for (int y = 0; y < data.Height; y += chunkHeight)
                         {
-                            ImageChunk chunk = new ImageChunk();
-                            chunk.bytes = new byte[Math.Min(9*100, rgbValues.Length - i)];
-                            chunk.start = i;
-                            
-                            for (int j = 0; j < chunk.bytes.Length; j++)
+                            for (int x = 0; x < data.Stride; x += chunkWidth)
                             {
-                                chunk.bytes[j] = rgbValues[i+ j];
+                                int currentChunkWidth = Math.Min(data.Stride - x, chunkWidth);
+                                int currentChunkHeight = Math.Min(data.Height - y, chunkHeight);
+                                ImageChunk chunk = new ImageChunk();
+                                chunk.start = y * data.Stride + x;
+                                chunk.width = currentChunkWidth;
+                                chunk.height = currentChunkHeight;
+                                byte[] buffer = new byte[currentChunkWidth * currentChunkHeight];
+                                for (int chY = 0; chY < currentChunkHeight; chY++)
+                                {
+                                    Array.Copy(rgbValues, y * data.Stride + x + chY * data.Stride, buffer, chY * currentChunkWidth, currentChunkWidth);
+                                }
+                                chunk.SetBytes(buffer);
+                                chunks.Add(chunk);
                             }
-                            chunks.Add(chunk);
                         }
                     }
                     else
@@ -156,7 +169,7 @@ namespace bettlroal
                 }
 
                 NetworkData d = new NetworkData();
-                d.Stride = b.Width;
+                d.Stride = data.Stride;
                 d.imageSize = rgbValues.Length;
                 d.type = NetworkData.DataType.ImageUpdate;
                 d.chunks = chunks;

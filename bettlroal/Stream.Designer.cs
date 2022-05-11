@@ -32,6 +32,8 @@ namespace bettlroal
             this.pbStream = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.cbDebug = new System.Windows.Forms.CheckBox();
+            this.lblBytes = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pbStream)).BeginInit();
             this.SuspendLayout();
             // 
@@ -66,11 +68,34 @@ namespace bettlroal
             this.label2.TabIndex = 2;
             this.label2.Text = "fps: 0";
             // 
+            // cbDebug
+            // 
+            this.cbDebug.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbDebug.AutoSize = true;
+            this.cbDebug.Location = new System.Drawing.Point(12, 437);
+            this.cbDebug.Name = "cbDebug";
+            this.cbDebug.Size = new System.Drawing.Size(85, 17);
+            this.cbDebug.TabIndex = 3;
+            this.cbDebug.Text = "debug mode";
+            this.cbDebug.UseVisualStyleBackColor = true;
+            // 
+            // lblBytes
+            // 
+            this.lblBytes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblBytes.AutoSize = true;
+            this.lblBytes.Location = new System.Drawing.Point(181, 457);
+            this.lblBytes.Name = "lblBytes";
+            this.lblBytes.Size = new System.Drawing.Size(0, 13);
+            this.lblBytes.TabIndex = 4;
+            // 
             // Stream
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(812, 482);
+            this.Controls.Add(this.lblBytes);
+            this.Controls.Add(this.cbDebug);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.pbStream);
@@ -88,5 +113,7 @@ namespace bettlroal
         public System.Windows.Forms.PictureBox pbStream;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.CheckBox cbDebug;
+        private System.Windows.Forms.Label lblBytes;
     }
 }
