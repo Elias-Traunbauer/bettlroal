@@ -27,8 +27,8 @@ namespace bettlroal
         int lastScreen = 0;
         int pauseBetweenScreens = 50;
 
-        public static int chunkDivider = 10;
-        public static int changeThreshold = 30;
+        public static int chunkDivider = 12;
+        public static int changeThreshold = 1000;
 
         public ScreenCast(int id)
         {
@@ -142,25 +142,39 @@ namespace bettlroal
                     }
                     else
                     {
-                        for (int i = 0; i < rgbValues.Length; i += data.Stride)
+                        int chunkWidth = data.Stride / chunkDivider;
+                        int chunkHeight = data.Height / chunkDivider;
+
+                        for (int y = 0; y < data.Height; y += chunkHeight)
                         {
-                            int length = Math.Min(data.Stride, rgbValues.Length - i);
-                            ImageChunk chunk = new ImageChunk();
-                            chunk.bytes = new byte[length];
-                            chunk.start = i;
-                            for (int j = 0; j < chunk.bytes.Length; j++)
+                            for (int x = 0; x < data.Stride; x += chunkWidth)
                             {
-                                chunk.bytes[j] = rgbValues[i + j];
-                            }
-                            
-                            byte[] oldChunk = new byte[length];
-                            for (int j = 0; j < oldChunk.Length; j++)
-                            {
-                                oldChunk[j] = previous[i + j];
-                            }
-                            if (!oldChunk.SequenceEqual(chunk.bytes))
-                            {
-                                chunks.Add(chunk);
+                                int currentChunkWidth = Math.Min(data.Stride - x, chunkWidth);
+                                int currentChunkHeight = Math.Min(data.Height - y, chunkHeight);
+                                ImageChunk chunk = new ImageChunk();
+                                chunk.start = y * data.Stride + x;
+                                chunk.width = currentChunkWidth;
+                                chunk.height = currentChunkHeight;
+                                byte[] buffer = new byte[currentChunkWidth * currentChunkHeight];
+                                byte[] old = new byte[currentChunkWidth * currentChunkHeight];
+                                for (int chY = 0; chY < currentChunkHeight; chY++)
+                                {
+                                    Array.Copy(rgbValues, y * data.Stride + x + chY * data.Stride, buffer, chY * currentChunkWidth, currentChunkWidth);
+                                }
+                                for (int chY = 0; chY < currentChunkHeight; chY++)
+                                {
+                                    Array.Copy(previous, y * data.Stride + x + chY * data.Stride, old, chY * currentChunkWidth, currentChunkWidth);
+                                }
+                                int change = 0;
+                                for (int i = 0; i < buffer.Length; i++)
+                                {
+                                    change += Math.Abs(buffer[i] - old[i]);
+                                }
+                                if (change > changeThreshold)
+                                {
+                                    chunk.SetBytes(buffer);
+                                    chunks.Add(chunk);
+                                }
                             }
                         }
                     }
