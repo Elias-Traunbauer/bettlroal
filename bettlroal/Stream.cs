@@ -85,8 +85,8 @@ namespace bettlroal
                         }
                     }
                 }
-                Bitmap b = new Bitmap(d.Stride / 2, previous.Length / (d.Stride));
-                BitmapData data = b.LockBits(new Rectangle(0, 0, b.Width, b.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format16bppRgb555);
+                Bitmap b = new Bitmap(d.Stride, previous.Length / (d.Stride));
+                BitmapData data = b.LockBits(new Rectangle(0, 0, b.Width, b.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
                 IntPtr ptr = data.Scan0;
                 Marshal.Copy(previous, 0, ptr, previous.Length);
                 b.UnlockBits(data);

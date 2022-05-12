@@ -106,7 +106,7 @@ namespace bettlroal
                 graphics.CopyFromScreen(bounds.Left, bounds.Top, 0, 0, bounds.Size);
                 screenTaken = Environment.TickCount;
                 b = ResizeImage(b, (int)(b.Width * qualityModifier / 10), (int)(b.Height * qualityModifier / 10));
-                BitmapData data = b.LockBits(new Rectangle(0, 0, b.Width, b.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format16bppRgb555);
+                BitmapData data = b.LockBits(new Rectangle(0, 0, b.Width, b.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
                 IntPtr intPtr = data.Scan0;
                 int bytes = Math.Abs(data.Stride) * b.Height;
                 byte[] rgbValues = new byte[bytes];
